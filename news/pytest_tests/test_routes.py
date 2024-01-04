@@ -1,60 +1,8 @@
-from http.client import OK, NOT_FOUND
 import pytest
+from http.client import OK, NOT_FOUND
 from pytest_django.asserts import assertRedirects
 
-from django.contrib.auth import get_user_model
 from django.urls import reverse
-
-from news.models import News, Comment
-
-User = get_user_model()
-
-
-@pytest.fixture
-def user(django_user_model):
-    """Фикстура пользователь."""
-    return django_user_model.objects.create(username='Пользователь')
-
-
-@pytest.fixture
-def user_client(user, client):
-    """Фикстура аутентифицированный пользователь."""
-    client.force_login(user)
-    return client
-
-
-@pytest.fixture
-def author(django_user_model):
-    """Фикстура автор."""
-    return django_user_model.objects.create(username='Автор')
-
-
-@pytest.fixture
-def author_client(author, client):
-    """Фикстура аутентифицированный автор."""
-    client.force_login(author)
-    return client
-
-
-@pytest.fixture
-def news():
-    """Фикстура новость."""
-    news = News.objects.create(
-        title='Заголовок',
-        text='Текст заметки'
-    )
-    return news
-
-
-@pytest.fixture
-def comment(news, author):
-    """Фикстура комментарий."""
-    comment = Comment.objects.create(
-        news=news,
-        author=author,
-        text='Текст комментария'
-    )
-    return comment
 
 
 @pytest.mark.django_db

@@ -1,48 +1,11 @@
 import pytest
 from datetime import timedelta
 
-from django.contrib.auth import get_user_model
+from django.utils import timezone
 from django.urls import reverse
 from django.conf import settings
-from django.utils import timezone
 
-from news.models import News, Comment
-
-User = get_user_model()
-
-
-@pytest.fixture
-def author(django_user_model):
-    """Фикстура автор."""
-    return django_user_model.objects.create(username='Автор')
-
-
-@pytest.fixture
-def news():
-    """Фикстура новость."""
-    news = News.objects.create(
-        title='Заголовок',
-        text='Текст заметки'
-    )
-    return news
-
-
-@pytest.fixture
-def comment(news, author):
-    """Фикстура комментарий."""
-    comment = Comment.objects.create(
-        news=news,
-        author=author,
-        text='Текст комментария'
-    )
-    return comment
-
-
-@pytest.fixture
-def detail_url(news):
-    """Фикстура пути к отдельной новости."""
-    detail_url = reverse('news:detail', args=(news.pk,))
-    return detail_url
+from news.models import News
 
 
 @pytest.mark.django_db
@@ -54,7 +17,9 @@ def test_count_news(client):
     ]
     News.objects.bulk_create(all_news)
     response = client.get(reverse('news:home'))
-    object_list = response.context['object_list']
+    object_list = response.context.get('object_list')
+    if object_list is None:
+        raise ('Исключение')
     news_count = len(object_list)
     assert news_count == settings.NEWS_COUNT_ON_HOME_PAGE
 
@@ -66,29 +31,28 @@ def test_news_order(client):
     Свежие новости в начале списка.
     """
     response = client.get(reverse('news:home'))
-    object_list = response.context['object_list']
+    object_list = response.context.get('object_list')
+    if object_list is None:
+        raise ('Исключение')
     all_dates = [news.date for news in object_list]
     sorted_dates = sorted(all_dates, reverse=True)
     assert all_dates == sorted_dates
 
 
 @pytest.mark.django_db
-def test_comments_order(news, client, author, detail_url):
+def test_comments_order(news, client, detail_url, comments):
     """
     Проверка сортировки комментариев на странице отдельной новости:
     старые в начале списка, новые — в конце.
     """
-    author = User.objects.create(username='Комментатор')
     now = timezone.now()
-    for index in range(2):
-        comment = Comment.objects.create(
-            news=news, author=author, text=f'Tекст {index}',
-        )
-        comment.created = now + timedelta(days=index)
-        comment.save()
+    comments.created = now + timedelta()
+    comments.save()
     response = client.get(detail_url)
     assert 'news' in response.context
-    news = response.context['news']
+    news = response.context.get('news')
+    if news is None:
+        raise ('Исключение')
     all_comments = news.comment_set.all()
     assert all_comments[0].created < all_comments[1].created
 
@@ -112,3 +76,6 @@ def test_authorized_client_has_form(client, detail_url, author):
     client.force_login(author)
     response = client.get(detail_url)
     assert 'form' in response.context
+    form = response.context.get('form')
+    if form is None:
+        raise ('Исключение')
