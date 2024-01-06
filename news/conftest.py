@@ -7,6 +7,7 @@ from news.models import News, Comment
 COMMENT_TEXT = 'Текст комментария'
 NEW_COMMENT_TEXT = 'Обновлённый комментарий'
 
+
 @pytest.fixture
 def user(django_user_model):
     """Фикстура пользователь."""
@@ -41,6 +42,7 @@ def news():
         text='Текст заметки'
     )
     return news
+
 
 @pytest.fixture
 def comment(news, author):
@@ -94,11 +96,13 @@ def url_to_comments(detail_url):
     url_to_comments = detail_url + '#comments'
     return url_to_comments
 
+
 @pytest.fixture
 def detail_url(news):
     """Фикстура пути к отдельной новости."""
     detail_url = reverse('news:detail', args=(news.pk,))
     return detail_url
+
 
 @pytest.fixture
 def comments(news, author):

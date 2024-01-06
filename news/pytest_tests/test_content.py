@@ -7,8 +7,9 @@ from django.conf import settings
 
 from news.models import News
 
+pytestmark = pytest.mark.django_db
 
-@pytest.mark.django_db
+
 def test_count_news(client):
     """Проверка, что количество новостей на главной странице — не более 10."""
     all_news = [
@@ -24,7 +25,6 @@ def test_count_news(client):
     assert news_count == settings.NEWS_COUNT_ON_HOME_PAGE
 
 
-@pytest.mark.django_db
 def test_news_order(client):
     """
     Проверка на то, что новости отсортированы от самой свежей к самой старой.
@@ -39,7 +39,6 @@ def test_news_order(client):
     assert all_dates == sorted_dates
 
 
-@pytest.mark.django_db
 def test_comments_order(news, client, detail_url, comments):
     """
     Проверка сортировки комментариев на странице отдельной новости:
@@ -57,7 +56,6 @@ def test_comments_order(news, client, detail_url, comments):
     assert all_comments[0].created < all_comments[1].created
 
 
-@pytest.mark.django_db
 def test_anonymous_client_has_no_form(client, detail_url):
     """
     Проверка, что анонимному пользователю недоступна
@@ -67,7 +65,6 @@ def test_anonymous_client_has_no_form(client, detail_url):
     assert 'form' not in response.context
 
 
-@pytest.mark.django_db
 def test_authorized_client_has_form(client, detail_url, author):
     """
     Проверка, что авторизованному пользователю доступна

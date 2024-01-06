@@ -4,8 +4,9 @@ from pytest_django.asserts import assertRedirects
 
 from django.urls import reverse
 
+pytestmark = pytest.mark.django_db
 
-@pytest.mark.django_db
+
 @pytest.mark.parametrize(
     'name',
     ('news:home', 'users:login', 'users:logout', 'users:signup')
@@ -20,7 +21,6 @@ def test_pages_availability_for_anonymous_user(client, name):
     assert response.status_code == OK
 
 
-@pytest.mark.django_db
 def test_pages_availability_for_author(client, news):
     """
     Страница отдельной новости доступна анонимному пользователю, а
@@ -32,7 +32,6 @@ def test_pages_availability_for_author(client, news):
     assert response.status_code == OK
 
 
-@pytest.mark.django_db
 @pytest.mark.parametrize(
     'parametrized_client, expected_status',
     (
@@ -56,7 +55,6 @@ def test_pages_availability_for_author(
     assert response.status_code == expected_status
 
 
-@pytest.mark.django_db
 @pytest.mark.parametrize(
     'name, note_object',
     (
