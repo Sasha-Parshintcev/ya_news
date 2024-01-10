@@ -48,7 +48,9 @@ def test_comments_order(news, client, detail_url, comments, now):
     if news is None:
         with pytest.raises(TypeError):
             all_comments = news.comment_set.all()
-            all_comments_created = [comments.created for comments in all_comments]
+            all_comments_created = [
+                comments.created for comments in all_comments
+            ]
             sorted_comments = sorted(all_comments, reverse=True)
             assert all_comments_created == sorted_comments
 
