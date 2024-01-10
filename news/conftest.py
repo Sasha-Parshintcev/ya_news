@@ -1,6 +1,8 @@
 import pytest
 
+from django.utils import timezone
 from django.urls import reverse
+from django.conf import settings
 
 from news.models import News, Comment
 
@@ -111,3 +113,18 @@ def comments(news, author):
             news=news, author=author, text=f'Tекст {index}',
         )
     return comments
+
+
+@pytest.fixture
+def all_news():
+    all_news = [
+        News(title=f'Новость {index}', text='Просто текст.')
+        for index in range(settings.NEWS_COUNT_ON_HOME_PAGE + 1)
+    ]
+    return all_news
+
+
+@pytest.fixture
+def now():
+    now = timezone.now()
+    return now

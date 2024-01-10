@@ -22,11 +22,7 @@ def test_pages_availability_for_anonymous_user(client, name):
 
 
 def test_pages_availability_for_author(client, news):
-    """
-    Страница отдельной новости доступна анонимному пользователю, а
-    авторизованный пользователь не может зайти на страницы редактирования
-    или удаления чужих комментариев.
-    """
+    """Страница отдельной новости доступна анонимному пользователю."""
     url = reverse('news:detail', args=(news.pk,))
     response = client.get(url)
     assert response.status_code == OK
