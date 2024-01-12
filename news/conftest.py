@@ -1,4 +1,5 @@
 import pytest
+from datetime import timedelta
 
 from django.utils import timezone
 from django.urls import reverse
@@ -108,23 +109,24 @@ def detail_url(news):
 
 @pytest.fixture
 def comments(news, author):
+    """Фикстура создания комментариев в цикле."""
+    now = timezone.now()
     for index in range(2):
         comments = Comment.objects.create(
             news=news, author=author, text=f'Tекст {index}',
         )
+        comments.created = now + timedelta()
+        comments.save()
     return comments
 
 
 @pytest.fixture
 def all_news():
+    """Фикстура группового создания объектов."""
     all_news = [
-        News(title=f'Новость {index}', text='Просто текст.')
-        for index in range(settings.NEWS_COUNT_ON_HOME_PAGE + 1)
+        News.objects.bulk_create(
+            News(title=f'Новость {index}', text='Просто текст.')
+            for index in range(settings.NEWS_COUNT_ON_HOME_PAGE + 1)
+        )
     ]
     return all_news
-
-
-@pytest.fixture
-def now():
-    now = timezone.now()
-    return now

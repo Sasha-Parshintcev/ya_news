@@ -2,8 +2,6 @@ import pytest
 from http.client import NOT_FOUND
 from pytest_django.asserts import assertRedirects, assertFormError
 
-from django.db import transaction
-
 from news.models import Comment
 from news.forms import BAD_WORDS, WARNING
 
@@ -23,7 +21,7 @@ def test_anonymous_user_cant_create_comment(detail_url, client, form_data):
     assert comments_count == Comment.objects.count()
 
 
-@transaction.atomic
+@pytest.mark.django_db
 def test_user_can_create_comment(author_client, detail_url,
                                  form_data, news, author):
     """
@@ -40,6 +38,7 @@ def test_user_can_create_comment(author_client, detail_url,
     assert comment.author == author
 
 
+@pytest.mark.django_db
 def test_user_cant_use_bad_words(author_client, detail_url):
     """
     Если комментарий содержит запрещённые слова,
@@ -57,7 +56,7 @@ def test_user_cant_use_bad_words(author_client, detail_url):
     assert comments_count == Comment.objects.count()
 
 
-@transaction.atomic
+@pytest.mark.django_db
 def test_author_can_delete_comment(author_client, delete_url, url_to_comments):
     """Авторизованный пользователь может удалять свои комментарии."""
     comments_count = Comment.objects.count()
@@ -66,7 +65,7 @@ def test_author_can_delete_comment(author_client, delete_url, url_to_comments):
     assert comments_count - 1 == Comment.objects.count()
 
 
-@transaction.atomic
+@pytest.mark.django_db
 def test_author_can_edit_comment(
     author_client, form_data_new, edit_url,
     url_to_comments, comment, news, author
