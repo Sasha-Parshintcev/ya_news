@@ -81,6 +81,7 @@ def test_author_can_edit_comment(
     assert comment.author == author
 
 
+@pytest.mark.django_db
 def test_user_cant_delete_comment_of_another_user(user_client, delete_url):
     """Авторизованный пользователь не может удалять чужие комментарии."""
     comments_count = Comment.objects.count()
